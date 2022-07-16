@@ -1,2 +1,3 @@
-# sap_material_management_training
+# SAP Material Management Training
+
 SAP MM Training Course Summary
