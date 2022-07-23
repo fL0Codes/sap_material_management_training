@@ -1,7 +1,15 @@
 - [Allgemeiner Bestellprozess](#allgemeiner-bestellprozess)
   - [Bestellung anlegen in SAP](#bestellung-anlegen-in-sap)
   - [Wareneingang in SAP](#wareneingang-in-sap)
-  - [Bestellhistorie](#bestellhistorie)
+  - [Bestellhistorie Materialbeleg](#bestellhistorie-materialbeleg)
+  - [Rechnungsprozess](#rechnungsprozess)
+  - [Bestellhistorie Rechnungsbeleg](#bestellhistorie-rechnungsbeleg)
+  - [Bezahlung der Rechnung](#bezahlung-der-rechnung)
+  - [Procure2Pay Zusammenfassung](#procure2pay-zusammenfassung)
+- [Unternehmensstruktur und Customizing](#unternehmensstruktur-und-customizing)
+  - [Anlage eines neuen Buchungskreises (einer neuen Firmierung)](#anlage-eines-neuen-buchungskreises-einer-neuen-firmierung)
+  - [Anlage von weitere Strukturen](#anlage-von-weitere-strukturen)
+  - [Testen der neuen Unternehmensstruktur](#testen-der-neuen-unternehmensstruktur)
 
 # Allgemeiner Bestellprozess
 
@@ -98,8 +106,124 @@ Der Warenbestand kann anschließend über die Transaktion MMBE geprüft werden:
 
 ![GR MMBE Usage](/documents/chapter_1/GR_MMBE_usage.png)
 
-## Bestellhistorie
+## Bestellhistorie Materialbeleg
 
 Die Historie zu einer Bestellung kann über die Transaktion ME23n unter "Bestellentwicklung" eingesehen werden:
 
 ![PO History](/documents/chapter_1/PO_history.png)
+
+## Rechnungsprozess
+
+Nach der Anlieferung der Waren wird der Lieferant zudem auch eine Rechnung versenden, die beglichen werden muss. Um basierend auf der PO eine Rechnung anzulegen, kann unter den Folgeaktionen zur Bestellung im SAP Menü die Transaktion MIRO ausgewählt werden:
+
+![Invoice Transaction](/documents/chapter_1/IN_MIRO.png)
+
+Innerhalb der Transaktion muss das Rechnungsdatum angegeben werden. Für die Rechnungserstellung kann zudem die PO als Referenz ausgewählt werden. Anschließend werden die PO Positionen inkl. deren Preis in die Rechnung geladen. Nun muss sichergestellt sein, dass stets der gesamte Rechnungsbetrag beglichen wird:
+
+![Invoice Messages](/documents/chapter_1/IN_MIRO_messages.png)
+
+War die Buchung erfolgreich, so wird die nachfolgende Meldung angezeigt zusammen mit der Belegnummer der Rechnung:
+
+![Invoice Document Number](/documents/chapter_1/IN_document_number.png)
+
+## Bestellhistorie Rechnungsbeleg
+
+Auch der Rechnungsbeleg wird in die Bestellhistorie verknüpft:
+
+![PO Invoice History](/documents/chapter_1/PO_history_invoice.png)
+
+## Bezahlung der Rechnung
+
+Das Bezahlen der Rechnung gehört nicht mehr in das SAP MM Modul, sondern ist Teil des SAP FI Moduls. Der Vollständigkeit wegen wird dieser Prozessschritt dennoch aufgeführt.
+
+Der nachfolgende SAP Menüeintrag zeigt, über welche Transaktion eine Bezahlung initiiert werden kann:
+
+![FI SAP Menu](/documents/chapter_1/FI_sap_menu.png)
+
+## Procure2Pay Zusammenfassung
+
+Das nachfolgende Bild zeigt eine Zusammenfassung des Bestellprozess bis hin zur Bezahlung der Rechnung:
+
+![Procure2Pay Cycle](/documents/chapter_1/procure2pay_cycle.png)
+
+# Unternehmensstruktur und Customizing
+
+## Anlage eines neuen Buchungskreises (einer neuen Firmierung)
+
+Innerhalb der SPRO unter dem nachfolgenden Punkt kann zunächst ein neuer Buchungskreis (engl. Company Code) angelegt werden:
+
+![Organizational Structure Company Code](/documents/chapter_2/OrgStruc_company_code.png)
+
+Anschließend erstellen wir einen neuen Buchungskreis indem wir diesen von einem bestehenden kopieren:
+
+![BUKRS Copy](/documents/chapter_2/BUKRS_Copy.png)
+
+Im Hintergrund werden mit den BUKRS verbundenen Daten geladen (das kann einige Zeit in Anspruch nehmen, da viele Daten geladen werden müssen).
+
+Es kann nun ein neuer BUKRS basierend auf einem bestehenden BUKRS angelegt werden.
+
+## Anlage von weitere Strukturen
+
+Anschließend können über weitere Customizing-Leitfäden Geschäftsbereiche, Einkaufsorganisationen, Werke, etc. angelegt werden.
+Diese Einträge finden sich ebenfalls im Customizing-Leitfaden für die Unternehmensstruktur. Dort dann unter anderen Subbäumen.
+
+## Testen der neuen Unternehmensstruktur
+
+Um die neue Unternehmensstruktur zu testen kann nun der Bestellprozess für die neu angelegten Struktur-Elemente durchgeführt werden:
+
+Bei der Erstellung einer PO basierend auf den neuen Strukturelementen kommt die nachfolgende Fehlermeldung auf:
+![Error PO Creation New EKOrg](/documents/chapter_2/PO_create_new_bukrs_error1.png)
+
+Grundsätzlich ist es im MM-Modul so, dass die Stammdaten stets organisationsbezogen angelegt werden. Demnach muss dem SAP-System klar gemacht werden, dass es einen Lieferanten 1000 auch für die neue EKOrg gibt. Demnach muss der Lieferant zur Lösung der Fehlermeldung neu für die EKOrg angelegt werden. Das geht über Transaktion XK01:
+
+![Vendor Creation - Step 1](/documents/chapter_2/BUKRS_create_new_vendor.png)
+
+Anschließend kann ein neuer Lieferant basierend auf der Vorlage eines bestehenden Lieferanten angelegt werden:
+
+![Vendor Creation - Step 2](/documents/chapter_2/BUKRS_create_new_vendor2.png)
+
+Nun kann die PO für die neue EKOrg und den Lieferanten angelegt werden. Allerdings kommt nun die folgende Fehlermeldung auf:
+
+![Error 2 PO Creation New EKOrg](/documents/chapter_2/PO_create_new_bukrs_error2.png)
+
+Das hängt damit zusammen, dass das Werk nicht der EKOrg zugewiesen ist und diese somit auch keine Bestellungen für dieses Werk aufgeben darf. Eine Zuordnung muss über die SPRO stattfinden, um anschließend das Material in das passende Werk bestellen zu können:
+
+![Assign EKOrg to Plant](/documents/chapter_2/BUKRS_assign_ekorg_to_plant.png)
+
+Außerdem ist kann es sinnvoll sein, die neue EKOrg via Customizing ebenfalls dem entsprechenden BUKRS zuzuweisen:
+
+![Assign EKOrg to BUKRS](/documents/chapter_2/BUKRS_assign_ekorg_to_bukrs.png)
+
+Nachdem dieses Customizing durchgeführt wurde kommt folgede Fehlermeldung, sobald die PO-Position eingetragen wird:
+
+![PO Creation Material Plant Error](/documents/chapter_2/PO_create_new_bukrs_error3.png)
+
+In diesem Fall muss, wie beim Lieferanten, das Material dem neuen Werk zugewiesen werden. Ein neues Material auf werksebene kann über die Transaktion MM01 angelegt werden:
+
+![MM01 New Material Creation - Step 1](/documents/chapter_2/MM01_create_material_for_plant.png)
+
+![MM01 New Material Creation - Step 2](/documents/chapter_2/MM01_create_material_for_plant2.png)
+
+Es muss sichergestellt sein, dass das Material auf allen Ebenen im Materialstamm gepflegt ist. Ansonsten erscheinen Fehlermeldungen wie diese:
+
+![MM01 New Material Creation - Step 3](/documents/chapter_2/MM01_create_material_for_plant3.png)
+
+In diesem Fall muss sichergestellt sein, dass für das Material in der Transaktion MM01 auch Buchhaltungsdaten hinterlegt sind!
+
+Anschließend kann die Bestellung erfolgreich gespeichert werden.
+
+Nun kann via MIGO ein Wareneingang gebucht werden. Dabei kommt es allerdings zu folgendem Fehler:
+
+![Goods Receipt Creation Error](/documents/chapter_2/PO_create_new_bukrs_error4.png)
+
+Um diesen Fehler zu beheben, muss die Transaktion FBN1 aufgerufen werden und dort das Nummernkreisintervall "50" für den entsprechenden Buchungskreis angelegt werden:
+
+![Goods Receipt Creation Error 2](/documents/chapter_2/PO_create_new_bukrs_error5.png)
+
+Bei der anschließenden Erstellung einer Rechnung über die Transaktion "MIRO" erscheint der folgende Fehler:
+
+![Invoice Creation Error](/documents/chapter_2/PO_create_new_bukrs_error6.png)
+
+Hier muss ebenfalls ein neues Nummernkreisintervall in der Transaktion FBN1 angelet werden:
+
+![Invoice Creation Error](/documents/chapter_2/PO_create_new_bukrs_error7.png)
