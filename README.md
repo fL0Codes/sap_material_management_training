@@ -1,4 +1,4 @@
-#SAP MM Complete Course
+# SAP MM Complete Course
 
 Dieser Kurs stellt eine allgemeine Einarbeitung in das SAP MM Modul und die zentralen Prozesse dar.
 
