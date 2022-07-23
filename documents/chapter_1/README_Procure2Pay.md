@@ -57,6 +57,7 @@ Zurück zum [Anfang](#procure-to-pay-process-bestellprozess)
 ## Bestellung anlegen in SAP
 
 Über die folgende Transaktion können wir eine Bestellung erstellen:
+
 ![PO TCodes](/documents/chapter_1/images/PO_tcodes.png)
 
 Im nachfolgenden Beispiel nutzen wir die Transaktion **ME21N**:
